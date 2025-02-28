@@ -1,0 +1,99 @@
+{% schema %}
+{
+  "name": "Banner Linh Hoạt",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Tiêu đề",
+      "default": "Chào mừng bạn đến với cửa hàng!"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Mô tả",
+      "default": "Mua sắm ngay hôm nay và nhận ưu đãi hấp dẫn."
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Hình nền"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Màu chữ",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Nội dung nút",
+      "default": "Mua ngay"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Liên kết nút"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Căn chỉnh nội dung",
+      "options": [
+        {
+          "value": "left",
+          "label": "Trái"
+        },
+        {
+          "value": "center",
+          "label": "Giữa"
+        },
+        {
+          "value": "right",
+          "label": "Phải"
+        }
+      ],
+      "default": "center"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Banner Linh Hoạt"
+    }
+  ]
+}
+{% endschema %}
+
+<div
+  class="banner"
+  style="background-image: url('{{ section.settings.background_image | img_url: 'master' }}'); text-align: {{ section.settings.text_alignment }};"
+>
+  <div class="banner-content" style="color: {{ section.settings.text_color }};">
+    <h2>{{ section.settings.heading }}</h2>
+    <p>{{ section.settings.subheading }}</p>
+    {% if section.settings.button_text != blank and section.settings.button_link != blank %}
+      <a href="{{ section.settings.button_link }}" class="banner-button">{{ section.settings.button_text }}</a>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .banner {
+    padding: 60px;
+    background-size: cover;
+    background-position: center;
+  }
+  .banner-content {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .banner-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #ff6600;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+</style>

@@ -1,0 +1,80 @@
+<!-- Đầu file: HTML và CSS (nếu cần) -->
+<link rel="stylesheet" href="{{ 'tiny-slider.css' | asset_url }}">
+
+<div class="slider-section mx-auto w-full max-w-[1200px] p-4">
+  <div class="my-slider">
+    {% for block in section.blocks %}
+      <div class="slide">
+        {% if block.settings.slide_image %}
+          <img
+            src="{{ block.settings.slide_image | image_url }}"
+            alt="{{ block.settings.slide_caption }}"
+            width="100%"
+            height="100%"
+            class="w-full h-auto"
+          >
+        {% endif %}
+        {% if block.settings.slide_caption != blank %}
+          <p class="slide-caption text-center mt-2 text-lg">{{ block.settings.slide_caption }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script src="{{ 'tiny-slider.js' | asset_url }}" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Khởi tạo slider với cấu hình cơ bản
+    var slider = tns({
+      container: '.my-slider',
+      items: 1,
+      slideBy: 'page',
+      autoplay: true,
+      controls: false,
+      nav: true,
+      mouseDrag: true,
+      responsive: {
+        640: {
+          items: 2,
+          gutter: 20,
+        },
+        900: {
+          items: 1,
+          gutter: 30,
+        },
+      },
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Slider Section",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "slide_image",
+          "label": "Slide Image"
+        },
+        {
+          "type": "text",
+          "id": "slide_caption",
+          "label": "Slide Caption",
+          "default": "Your caption here"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Slider Section"
+    }
+  ]
+}
+{% endschema %}

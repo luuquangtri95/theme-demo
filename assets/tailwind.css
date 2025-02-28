@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+.tns-controls, .tns-nav {
+    display: none !important;
+}
+
+.tns-nav-active {
+    border: 1px solid #000;
+}

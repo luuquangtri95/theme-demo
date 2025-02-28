@@ -1,0 +1,61 @@
+{% schema %}
+{
+  "name": "topbar",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "label": "Enter text", "id": "title", "default": "Đây là default !" },
+    {
+      "type": "select",
+      "id": "horizontal_position",
+      "label": "Horizontal Position",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Start"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "flex-end",
+          "label": "End"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "vertical_position",
+      "label": "Vertical Position",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Middle"
+        },
+        {
+          "value": "flex-end",
+          "label": "Bottom"
+        }
+      ],
+      "default": "center"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Topbar"
+    }
+  ],
+  "enabled_on": {
+    "groups": ["header"]
+  }
+}
+{% endschema %}
+
+<div class="topbar max-w-full h-[35px] flex items-center justify-center text-[12px] bg-[#ffe9cf] md:text-[14px] lg:text-[16px]">
+  {{ section.settings.title }}
+</div>

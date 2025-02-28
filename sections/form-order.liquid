@@ -1,0 +1,142 @@
+{% schema %}
+{
+  "name": "form-order",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "form_name",
+      "label": "Change Form Name",
+      "default": "Đây là form default!"
+    },
+    {
+      "type": "number",
+      "id": "form_border",
+      "label": "Change Form Border",
+      "default": 5
+    }
+  ],
+  "blocks": [
+    {
+      "type": "input_field",
+      "name": "Form Field",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Field Label",
+          "default": "Enter title"
+        },
+        {
+          "type": "select",
+          "id": "input_type",
+          "label": "Input type",
+          "options": [
+            { "value": "text", "label": "Text" },
+            { "value": "email", "label": "Email" },
+            { "value": "number", "label": "Number" },
+            { "value": "textarea", "label": "Textarea" }
+          ],
+          "default": "text"
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "Placeholder",
+          "default": "Enter content..."
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Required",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "pick_collection",
+      "name": "Pick Collection",
+      "settings": []
+    }
+  ],
+  "presets": [
+    {
+      "name": "Form Order"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+  .container-form-order {
+    margin: 0 auto;
+    max-width: 1200px;
+    width: 400px;
+    padding: 0 20px;
+  }
+
+  .form-control {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: start;
+    align-items: flex-start;
+  }
+
+  .form-field {
+    width: 100%;
+
+    outline: none;
+    border: 1px solid #eee;
+
+    padding: 5px;
+  }
+
+  #form-order-test {
+    border: 1px solid #ccc;
+    padding: 20px;
+  }
+
+  .form-name {
+    margin-bottom: 5px;
+  }
+</style>
+
+<div class="container-form-order">
+  <form action="" method="post" id="form-order-test">
+    <h2 class="form-name">{{ section.settings.form_name }}</h2>
+
+    {% comment %} render blocks {% endcomment %}
+    {% for block in section.blocks %}
+      <div class="form-control">
+        <label for="input-{{ block.id }}" class="form-label">{{ block.settings.label }}</label>
+
+        {% if block.settings.input_type == 'textarea' %}
+          <textarea
+            id="input-{{ block.id }}"
+            name="input-{{ block.id }}"
+            class="form-field"
+            placeholder="{{ block.settings.placeholder }}"
+            {% if block.settings.required %}
+              required
+            {% endif -%}
+          ></textarea>
+
+        {% else %}
+          <input
+            id="input-{{ block.id }}"
+            type="{{ block.settings.input_type }}"
+            name="input-{{ block.id }}"
+            class="form-field"
+            placeholder="{{ block.settings.placeholder }}"
+            {% if block.settings.required %}
+              required
+            {% endif %}
+          >
+        {% endif %}
+      </div>
+    {% endfor %}
+  </form>
+</div>
+
+<script></script>

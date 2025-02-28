@@ -1,0 +1,21 @@
+{
+  "name": "chutruyfood",
+  "version": "1.0.0",
+  "description": "[![Build status](https://github.com/shopify/dawn/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Shopify/dawn/actions/workflows/ci.yml?query=branch%3Amain) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?color=informational)](/.github/CONTRIBUTING.md)",
+  "main": "index.js",
+  "scripts": {
+    "start": "shopify theme dev",
+    "build:css": "npx @tailwindcss/cli -i ./assets/tailwind.css -o ./assets/main.css --watch --poll",
+    "dev": "concurrently \"npm run start\" \"npm run build:css\""
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.0.8",
+    "concurrently": "^9.1.2",
+    "tailwindcss": "^4.0.8"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "^3.5.2"
+  }
+}

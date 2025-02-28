@@ -1,0 +1,8 @@
+<script>
+  if (!window.cartManagerScriptLoaded) {
+    var script = document.createElement('script');
+    script.src = "{{ 'cart-manager.js' | asset_url }}";
+    document.body.appendChild(script);
+    window.cartManagerScriptLoaded = true;
+  }
+</script>

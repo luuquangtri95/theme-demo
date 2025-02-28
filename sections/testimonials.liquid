@@ -1,0 +1,89 @@
+{% schema %}
+{
+  "name": "Testimonials",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Tiêu đề",
+      "default": "Khách hàng nói gì về chúng tôi?"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Lời chứng thực",
+      "settings": [
+        {
+          "type": "text",
+          "id": "customer_name",
+          "label": "Tên khách hàng",
+          "default": "Nguyễn Văn A"
+        },
+        {
+          "type": "textarea",
+          "id": "testimonial_text",
+          "label": "Nội dung",
+          "default": "Dịch vụ tuyệt vời! Tôi sẽ mua hàng lần nữa."
+        },
+        {
+          "type": "image_picker",
+          "id": "customer_photo",
+          "label": "Ảnh khách hàng"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials"
+    }
+  ]
+}
+{% endschema %}
+
+<div class="testimonials">
+  <h2>{{ section.settings.section_title }}</h2>
+  <div class="testimonial-list">
+    {% for block in section.blocks %}
+      <div class="testimonial-item">
+        {% if block.settings.customer_photo %}
+          <img
+            src="{{ block.settings.customer_photo | img_url: 'small' }}"
+            alt="Ảnh của {{ block.settings.customer_name }}"
+          >
+        {% endif %}
+        <p>
+          <strong>{{ block.settings.customer_name }}</strong>
+        </p>
+        <p>{{ block.settings.testimonial_text }}</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .testimonials {
+    text-align: center;
+    padding: 40px 20px;
+    background: #f9f9f9;
+  }
+  .testimonial-list {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .testimonial-item {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+  }
+  .testimonial-item img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+</style>
