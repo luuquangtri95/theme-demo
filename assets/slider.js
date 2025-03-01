@@ -4,15 +4,17 @@ class Slider {
     sliderNavSelector = ".nav-inner",
     displayItemOnScreen = 1,
     responsiveConfig = {},
+    globalConfig = {}
   } = {}) {
     this.selectors = {
       sliderContainerSelector,
-      sliderNavSelector,
+      sliderNavSelector
     };
 
     this.settings = {
       displayItemOnScreen,
       responsiveConfig,
+      globalConfig
     };
 
     this.instanceSlider;
@@ -21,16 +23,22 @@ class Slider {
   }
 
   init() {
+    if (this.instanceSlider) {
+      this.instanceSlider.destroy();
+    }
+
     this.instanceSlider = tns({
       container: this.selectors.sliderContainerSelector,
       items: this.settings.displayItemOnScreen,
-      loop: true,
+      loop: false,
       preventScrollOnTouch: true,
       mouseDrag: true,
-      navContainer: this.selectors.sliderNavSelector,
+      gutter: 2,
+      startIndex: 0,
+      ...this.settings.globalConfig,
       responsive: {
-        ...this.settings.responsiveConfig,
-      },
+        ...this.settings.responsiveConfig
+      }
     });
   }
 

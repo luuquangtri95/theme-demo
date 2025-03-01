@@ -1,43 +1,65 @@
 <link rel="stylesheet" href="{{ 'tiny-slider.css' | asset_url }}">
 
-<div class="main-page max-w-full mx-auto w-[1200px]">
+<div class="main-page max-w-full mx-auto w-[1200px] lg:mt-[30px]">
   <div class="grid grid-cols-1 md:grid-cols-2">
     <div class="product-carousel max-w-full max-h-full mb-[24px]">
-      <div>
+      <div class="lg:flex ">
         {% comment %} PRODUCT SLIDE CONTAINER {% endcomment %}
-        <div class="product-slider">
-          {% if product.images.size > 0 %}
-            {% for image in product.images %}
-              <div class="h-[300px]" data-image-id="{{ image.id }}">
-                <img
-                  src="{{ image | image_url }}"
-                  width="300"
-                  height="300"
-                  class="h-full w-full"
-                  alt=""
-                  loading="lazy">
-              </div>
-            {% endfor %}
-          {% endif %}
+        <div class="lg:order-1">
+          <div class="product-slider">
+            {%- if product.images.size > 0 -%}
+              {%- for image in product.images -%}
+                <div class="aspect-square w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
+                  <img
+                    srcset="
+                      {% if image.width >= 180 %}{{ image | image_url: width: 180 }} 180w,{% endif %}
+                      {% if image.width >= 375 %}{{ image | image_url: width: 375 }} 375w,{% endif %}
+                      {% if image.width >= 1100 %}{{ image | image_url: width: 1100 }} 1100w,{% endif %}
+                      {% if image.width >= 1600 %}{{ image | image_url: width: 1600 }} 1600w,{% endif %}
+                      {% if image.width >= 1900 %}{{ image | image_url: width: 1900 }} 1900w,{% endif %}
+                      {{ image | image_url }} {{ image.width }}w
+                    "
+                    src="{{ image | image_url: width: 375 }}"
+                    sizes="(min-width: 1200px) 25vw, (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
+                    loading="lazy"
+                    width="576"
+                    height="{{ 576 | divided_by: image.aspect_ratio }}"
+                    class="w-full h-full object-cover"
+                    alt="{{ image.alt | default: product.title | escape }}">
+                </div>
+              {%- endfor -%}
+            {%- endif -%}
+          </div>
         </div>
 
+
         {% comment %} PRODUCT SLIDE NAV {% endcomment %}
-        <div class="product-image-nav relative w-full mt-2 overflow-hidden px-1">
-          <div class="nav-inner flex gap-2 transition-transform duration-300 ease-out">
-            {% if product.images.size > 0 %}
-              {% for image in product.images %}
-                <div class="nav-item h-[50px] flex-none basis-1/4" data-image-id="{{ image.id }}">
-                  <img
-                    src="{{ image | image_url }}"
-                    width="300"
-                    height="300"
-                    alt=""
-                    class="object-cover w-full h-full"
-                    loading="lazy">
-                </div>
-              {% endfor %}
-            {% endif %}
-          </div>
+        <div class="product-slider-nav mt-[2px] lg:mr-[20px]">
+          {%- if product.images.size > 0 -%}
+            {%- for image in product.images -%}
+              <div
+                class="product-nav-item h-[70px]"
+                data-image-id="{{ image.id }}"
+                data-media-index="{{ forloop.index }}">
+                <img
+                  srcset="
+                    {% if image.width >= 180 %}{{ image | image_url: width: 180 }} 180w,{% endif %}
+                    {% if image.width >= 375 %}{{ image | image_url: width: 375 }} 375w,{% endif %}
+                    {% if image.width >= 1100 %}{{ image | image_url: width: 1100 }} 1100w,{% endif %}
+                    {% if image.width >= 1600 %}{{ image | image_url: width: 1600 }} 1600w,{% endif %}
+                    {% if image.width >= 1900 %}{{ image | image_url: width: 1900 }} 1900w,{% endif %}
+                    {{ image | image_url }} {{ image.width }}w
+                  "
+                  src="{{ image | image_url: width: 375 }}"
+                  sizes="(min-width: 1200px) 25vw, (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
+                  loading="lazy"
+                  width="576"
+                  height="{{ 576 | divided_by: image.aspect_ratio }}"
+                  class="w-full h-full object-cover lg:min-w-[70px]"
+                  alt="{{ image.alt | default: product.title | escape }}">
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
         </div>
       </div>
     </div>
@@ -46,143 +68,108 @@
     <div class="product-detail">
       <div class="px-[15px]">
         <div class="product-vendor">
-          <a href="#" class="text-[13px] font-[300] text-[#808080]">{{ product.collections.first.title }}</a>
+          <a href="#" class="text-[13px] font-[300] text-[#808080]">
+            {{- product.collections.first.title -}}
+          </a>
         </div>
 
-        <h1 class="text-[20px] text-black font-[500] leading-[1.25] mb-[10px]">{{ product.title }}</h1>
-        <div class="text-[13px] font-[300] leading-[1.25] mb-[10px]">{{ product.description }}</div>
-        <p class="font-[300] text-[#ff6e00] text-[13px] py-[20px]">Only {{ product.variants.first.inventory_quantity }} left in stock!</p>
+        <h1 class="text-[20px] text-black font-[500] leading-[1.25] mb-[10px] lg:text-[25px]">
+          {{ product.title }}
+        </h1>
+        <div class="text-[13px] font-[300] leading-[1.25] mb-[10px] lg:text-[14px]">
+          {{ product.description }}
+        </div>
+        <p class="font-[300] text-[#ff6e00] text-[13px] py-[20px]">
+          Only {{ product.variants.first.inventory_quantity }} left in stock!
+        </p>
+
+        <div class="lg:border lg:border-[#ccc] lg:w-full lg:h-[1px] lg:mb-[20px]"></div>
 
         {% comment %} component price {% endcomment %}
         <div>
-          {% if settings.currency_code_enable %}
-            <p class="text-[30px] font-[500] leading-[1.2] text-[#000]">{{ product.price | money_with_currency }}</p>
-          {% else %}
+          {%- if settings.currency_code_enable -%}
             <p class="text-[30px] font-[500] leading-[1.2] text-[#000]">
-              {{ product.price | money }}</p>
-          {% endif %}
+              {{ product.price | money_with_currency }}
+            </p>
+          {%- else -%}
+            <p class="text-[30px] font-[500] leading-[1.2] text-[#000]">
+              {{ product.price | money }}
+            </p>
+          {%- endif -%}
         </div>
       </div>
-    </div>
 
-    {% comment %} PRODUCT VARIANTS {% endcomment %}
-    <div class="product-options my-[20px]">
-      {% for variant in product.variants %}
+      {% comment %} PRODUCT VARIANTS {% endcomment %}
+      <div class="product-options my-[20px] mx-[20px] text-[13px]">
+        {%- if product.selected_or_first_available_variant -%}
+          {%- for option in product.options_with_values -%}
+            <div class="mt-4">
+              <p class="mb-2">
+                Select {{ option.name }}:
+                <strong>
+                  {{- product.variants.first.options[forloop.index0] -}}
+                </strong>
+              </p>
 
-      {% endfor %}
+              <div class="product-options-list">
+                <div class="grid grid-cols-4 gap-[5px]">
+                  {%- for value in option.values -%}
+                    {%- for variant in product.variants -%}
+                      {%- if variant.options contains value and variant.featured_image
+                      -%}
+                        <div class="product-option-item">
+                          <div class="relative flex-[0_0_25%]">
+                            <input
+                              type="radio"
+                              id="option-{{ option.name | handleize }}-{{ forloop.index0 }}"
+                              name="option-{{ option.name | handleize }}"
+                              class="hidden peer"
+                              value="{{ value }}"
+                              data-title="{{ product.variants.first.title }}"
+                              data-variant-id="{{ product.variants.first.id }}"
+                              {%- if product.selected_or_first_available_variant.options contains value %}
+                              checked
+                              {%- endif %}>
+                            {% comment %} chatgpt phân biệt giữa peer và group, 1 thằng tương tác parent child 1 thằng tương tác theo dạng sibling... {% endcomment %}
+                            <label
+                              for="option-{{ option.name | handleize }}-{{ forloop.index0 }}"
+                              style="background-image: url('{{ variant.featured_image | image_url }}');"
+                              class="product-option-label bg-center bg-cover block cursor-pointer border border-gray-300 rounded-md 
+                            peer-checked:border-black peer-checked:ring-1 peer-checked:ring-black">
+
+                              <span class="block h-[87px]"></span>
+                            </label>
+
+                            {% comment %} icon checked {% endcomment %}
+                            <span class="icon-checkbox hidden peer-checked:block z-10">
+                              {% render "icon-checkbox" %}
+                            </span>
+                          </div>
+                        </div>
+                        {%- break -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                  {%- endfor -%}
+                </div>
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
     </div>
   </div>
 </div>
 
+<script>
+  window.productData = {
+    variants: {{ product.variants | json }},
+    options: {{ product.options | json }}
+  };
+</script>
 <script src="{{ 'tiny-slider.js' |  asset_url }}" defer></script>
 <script src="{{ 'slider.js' |  asset_url }}" defer></script>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-  var mainSlider = new Slider();
-
-  // Lấy phần tử nav slider và nav items
-  const navInner = document.querySelector('.nav-inner');
-  const navItems = document.querySelectorAll('.nav-item');
-
-  // Số lượng nav item
-  const totalNavItems = navItems.length;
-  // Giả sử container nav hiển thị 4 mục
-  const visibleCount = 4;
-  // Lấy chiều rộng của một nav item (nếu có)
-  const itemWidth = navItems[0] ? navItems[0].offsetWidth : 0;
-
-  // Hàm cập nhật transform của navInner dựa trên index slide hiện tại (cách cũ)
-  function updateNavPosition(currentSlideIndex) {
-    if (currentSlideIndex >= visibleCount) {
-      const shiftIndex = currentSlideIndex - (visibleCount - 1);
-      navInner.style.transform = `translate3d(-${shiftIndex * itemWidth}px, 0, 0)`;
-    } else {
-      navInner.style.transform = 'translate3d(0px, 0, 0)';
-    }
-  }
-
-  // Thêm sự kiện kéo (drag) cho nav slider dùng transform
-  let isDragging = false;
-  let dragStartX = 0;
-  let initialTranslateX = 0;
-
-  // Hàm lấy giá trị translateX hiện tại
-  function getCurrentTranslateX(element) {
-    const style = window.getComputedStyle(element);
-    const transform = style.transform;
-    if (transform && transform !== 'none') {
-      // Nếu transform có dạng matrix(a, b, c, d, tx, ty)
-      const values = transform.split('(')[1].split(')')[0].split(',');
-      return parseFloat(values[4]);
-    }
-    return 0;
-  }
-
-  function startDrag(e) {
-    isDragging = true;
-    dragStartX = e.touches ? e.touches[0].clientX : e.clientX;
-    initialTranslateX = getCurrentTranslateX(navInner);
-    // Tắt transition để di chuyển mượt trong quá trình kéo
-    navInner.style.transition = 'none';
-  }
-
-  function onDrag(e) {
-    if (!isDragging) return;
-    const currentX = e.touches ? e.touches[0].clientX : e.clientX;
-    const dx = currentX - dragStartX;
-    navInner.style.transform = `translate3d(${initialTranslateX + dx}px, 0, 0)`;
-  }
-
-  function endDrag(e) {
-    if (!isDragging) return;
-    isDragging = false;
-    // Tính dx
-    const endX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-    const dx = endX - dragStartX;
-    // Ngưỡng kéo đủ lớn (ví dụ: 30% của itemWidth)
-    const threshold = itemWidth * 0.3;
-    let newIndex = 0;
-    // Tính toán slide hiện tại dựa trên translateX ban đầu
-    let currentIndex = Math.round(-initialTranslateX / itemWidth);
-    if (dx < -threshold && currentIndex < totalNavItems - 1) {
-      newIndex = currentIndex + 1;
-    } else if (dx > threshold && currentIndex > 0) {
-      newIndex = currentIndex - 1;
-    } else {
-      newIndex = currentIndex;
-    }
-    // Bật lại transition và "snap" về vị trí của newIndex
-    navInner.style.transition = 'transform 0.3s ease';
-    navInner.style.transform = `translate3d(-${newIndex * itemWidth}px, 0, 0)`;
-  }
-
-  // Gắn các sự kiện chuột cho nav slider
-  navInner.addEventListener('mousedown', startDrag);
-  navInner.addEventListener('mousemove', onDrag);
-  navInner.addEventListener('mouseup', endDrag);
-  navInner.addEventListener('mouseleave', endDrag);
-
-  // Gắn các sự kiện cảm ứng
-  navInner.addEventListener('touchstart', startDrag);
-  navInner.addEventListener('touchmove', onDrag);
-  navInner.addEventListener('touchend', endDrag);
-
-  // Bắt sự kiện thay đổi index của mainSlider (Tiny Slider cung cấp sự kiện indexChanged)
-  mainSlider.getInstance().events.on('indexChanged', function (info) {
-    let currentSlide = info.index; // Điều chỉnh nếu cần (ví dụ: info.index - 1 nếu có clone)
-    updateNavPosition(currentSlide);
-  });
-
-  // Cho phép người dùng click vào nav slider để chuyển main slider
-  navItems.forEach((item, index) => {
-    item.addEventListener('click', () => {
-      mainSlider.getInstance().goTo(index);
-    });
-  });
-  });
-
-</script>
+<script src="{{ 'handle-slider.js' | asset_url }}" defer></script>
+<script src="{{ 'handle-variants.js' | asset_url }}" defer></script>
 
 {% schema %}
   {

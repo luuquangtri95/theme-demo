@@ -1,73 +1,87 @@
 {% schema %}
-{
-  "name": "Featured Product Section",
-  "tag": "section",
-  "class": "section",
-  "disabled_on": {
-    "groups": ["header", "footer"]
-  },
-  "settings": [
-    { "type": "collection", "id": "collection", "label": "Select Collection" },
-    {
-      "type": "select",
-      "id": "products_per_page",
-      "options": [
-        {
-          "label": "5 product",
-          "value": "5"
-        },
-        {
-          "label": "10 product",
-          "value": "10"
-        },
-        {
-          "label": "15 product",
-          "value": "15"
-        },
-        {
-          "label": "20 product",
-          "value": "20"
-        }
-      ],
-      "default": "10",
-      "label": "Products Per Page"
+  {
+    "name": "Featured Product Section",
+    "tag": "section",
+    "class": "section",
+    "disabled_on": {
+      "groups": ["header", "footer"]
     },
-    {
-      "type": "checkbox",
-      "id": "show_product_has_quantity",
-      "label": "Show Product Has Quantity",
-      "default": false
-    },
-    {
-      "type": "range",
-      "id": "product_columns_desktop",
-      "label": "Columns For Desktop",
-      "min": 2,
-      "step": 1,
-      "max": 6,
-      "default": 3
-    },
-    {
-      "type": "range",
-      "id": "product_columns_mobile",
-      "label": "Columns For Mobile",
-      "min": 1,
-      "step": 1,
-      "max": 3,
-      "default": 2
-    },
-    { "type": "text", "id": "section_heading", "label": "Section Heading", "default": "Section Heading" },
-    { "type": "text", "id": "section_desc", "label": "Section Description", "default": "Description" }
-  ],
-  "presets": [
-    {
-      "name": "Featured Product Section",
-      "settings": {
-        "collection": ""
+    "settings": [
+      {
+        "type": "collection",
+        "id": "collection",
+        "label": "Select Collection"
+      },
+      {
+        "type": "select",
+        "id": "products_per_page",
+        "options": [
+          {
+            "label": "5 product",
+            "value": "5"
+          },
+          {
+            "label": "10 product",
+            "value": "10"
+          },
+          {
+            "label": "15 product",
+            "value": "15"
+          },
+          {
+            "label": "20 product",
+            "value": "20"
+          }
+        ],
+        "default": "10",
+        "label": "Products Per Page"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_product_has_quantity",
+        "label": "Show Product Has Quantity",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "product_columns_desktop",
+        "label": "Columns For Desktop",
+        "min": 2,
+        "step": 1,
+        "max": 6,
+        "default": 3
+      },
+      {
+        "type": "range",
+        "id": "product_columns_mobile",
+        "label": "Columns For Mobile",
+        "min": 1,
+        "step": 1,
+        "max": 3,
+        "default": 2
+      },
+      {
+        "type": "text",
+        "id": "section_heading",
+        "label": "Section Heading",
+        "default": "Section Heading"
+      },
+      {
+        "type": "text",
+        "id": "section_desc",
+        "label": "Section Description",
+        "default": "Description"
       }
-    }
-  ]
-}
+    ],
+    "presets": [
+      {
+        "name": "Featured Product Section",
+        "settings": {
+          "collection": ""
+        }
+      }
+    ]
+  }
 {% endschema %}
 
 <div class="w-[1200px] max-w-full mx-auto p-2">
@@ -77,9 +91,7 @@
     <div class="w-[60px] h-[2px] bg-[#aaa]"></div>
     <span>{{ section.settings.section_desc }}</span>
   </div>
-  <div
-    class="grid grid-cols-{{ section.settings.product_columns_mobile }} sm:grid-cols-{{ section.settings.product_columns_mobile }} md:grid-cols-{{ section.settings.product_columns_desktop }} lg:grid-cols-{{ section.settings.product_columns_desktop }} gap-4"
-  >
+  <div class="grid grid-cols-{{ section.settings.product_columns_mobile }} sm:grid-cols-{{ section.settings.product_columns_mobile }} md:grid-cols-{{ section.settings.product_columns_desktop }} lg:grid-cols-{{ section.settings.product_columns_desktop }} gap-4">
     {% if section.settings.collection and section.settings.collection.products.size > 0 %}
       {% for product in section.settings.collection.products limit: section.settings.products_per_page %}
         {% if section.settings.show_product_has_quantity %}
@@ -97,8 +109,7 @@
             href="{{ product.url }}"
             class="product-card border p-2 rounded-md {% if section.settings.show_product_has_quantity %}border-[#ccc]{% else %}border-[#eee] relative{% endif %}"
             data-variant-id="{{ product.variants[0].id }}"
-            data-variant-quantity="{{ product.variants.first.inventory_quantity }}"
-          >
+            data-variant-quantity="{{ product.variants.first.inventory_quantity }}">
             <div class="product-card-header h-auto md:min-h-[200px]">
               {% if product.featured_image != blank %}
                 <img
@@ -106,16 +117,14 @@
                   width="100%"
                   height="250px"
                   class="block max-w-full"
-                  alt="{{ product.title |  escape }}"
-                >
+                  alt="{{ product.title |  escape }}">
               {% else %}
                 <img
                   src="https://placehold.co/600x600"
                   width="100%"
                   height="250px"
                   class="block max-w-full"
-                  alt="{{ product.title }}"
-                >
+                  alt="{{ product.title }}">
               {% endif %}
             </div>
             <div class="product-content p-1 {% unless section.settings.show_product_has_quantity %}text-[#000]{% endunless %}">
@@ -137,14 +146,12 @@
                       class="quantity w-[60px] h-[35px] rounded-md border border-[#ccc] p-2"
                       value="1"
                       min="1"
-                      max="{{ product.selected_or_first_available_variant.inventory_quantity }}"
-                    >
+                      max="{{ product.selected_or_first_available_variant.inventory_quantity }}">
                   </div>
                 </div>
               {% endif %}
             </div>
-            {% if section.settings.show_product_has_quantity == false
-              and product.selected_or_first_available_variant.inventory_quantity == 0
+            {% if section.settings.show_product_has_quantity == false and product.selected_or_first_available_variant.inventory_quantity == 0
             %}
               <div class="absolute w-[60px] bg-[#9a9a9a] top-0">
                 <p class="font-[500] text-[#fff] text-[12px] text-center">Sold Out</p>
@@ -163,8 +170,7 @@
               width="100%"
               height="250px"
               class="block max-w-full"
-              alt="Sample Product"
-            >
+              alt="Sample Product">
           </div>
           <div class="product-content p-1 text-[#000]">
             <p class="text-[12px] lg:text-[16px]">
@@ -183,8 +189,7 @@
                   class="quantity w-[60px] h-[35px] rounded-md border border-[#ccc] p-2"
                   value="1"
                   min="1"
-                  max="10"
-                >
+                  max="10">
               </div>
             </div>
           </div>
