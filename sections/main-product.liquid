@@ -1,8 +1,12 @@
 <link rel="stylesheet" href="{{ 'tiny-slider.css' | asset_url }}">
 
-<div class="main-page max-w-full mx-auto w-[1200px] lg:mt-[30px]">
-  <div class="grid grid-cols-1 md:grid-cols-2">
-    <div class="product-carousel max-w-full max-h-full mb-[24px]">
+{%- assign option_name = section.settings.change_image_variant_option -%}
+
+{%- assign productTest = product -%}
+
+<div class="main-page max-w-full mx-auto w-[1440px] lg:mt-[30px]" data-section-id="{{ section.id }}">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:flex">
+    <div class="product-carousel max-w-full max-h-full mb-[24px]" data-item-showing="{{ section.settings.item_showing_on_slice }}">
       <div class="lg:flex ">
         {% comment %} PRODUCT SLIDE CONTAINER {% endcomment %}
         <div class="lg:order-1">
@@ -25,20 +29,20 @@
                     width="576"
                     height="{{ 576 | divided_by: image.aspect_ratio }}"
                     class="w-full h-full object-cover"
-                    alt="{{ image.alt | default: product.title | escape }}">
+                    alt="{{ image.alt | default: product.title | escape }}"
+                    data-image-id="{{ image.id }}">
                 </div>
               {%- endfor -%}
             {%- endif -%}
           </div>
         </div>
-
-
         {% comment %} PRODUCT SLIDE NAV {% endcomment %}
         <div class="product-slider-nav mt-[2px] lg:mr-[20px]">
           {%- if product.images.size > 0 -%}
             {%- for image in product.images -%}
+              {{ image.id | json }}
               <div
-                class="product-nav-item h-[70px]"
+                class="product-nav-item h-[70px] lg:h-[120px] lg:w-[120px] "
                 data-image-id="{{ image.id }}"
                 data-media-index="{{ forloop.index }}">
                 <img
@@ -56,7 +60,8 @@
                   width="576"
                   height="{{ 576 | divided_by: image.aspect_ratio }}"
                   class="w-full h-full object-cover lg:min-w-[70px]"
-                  alt="{{ image.alt | default: product.title | escape }}">
+                  alt="{{ image.alt | default: product.title | escape }}"
+                  data-image-id="{{ image.id }}">
               </div>
             {%- endfor -%}
           {%- endif -%}
@@ -65,101 +70,163 @@
     </div>
 
     {% comment %} PRODUCT DETAIL {% endcomment %}
-    <div class="product-detail">
+    <div class="product-detail product-detail-container lg:flex-[0,0,33%]">
       <div class="px-[15px]">
-        <div class="product-vendor">
-          <a href="#" class="text-[13px] font-[300] text-[#808080]">
-            {{- product.collections.first.title -}}
-          </a>
-        </div>
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'title' -%}
+              <h1 class="text-[20px] text-black font-[500] leading-[1.25] mb-[10px] lg:text-[25px]">
+                {{ product.title | escape }}
+              </h1>
 
-        <h1 class="text-[20px] text-black font-[500] leading-[1.25] mb-[10px] lg:text-[25px]">
-          {{ product.title }}
-        </h1>
-        <div class="text-[13px] font-[300] leading-[1.25] mb-[10px] lg:text-[14px]">
-          {{ product.description }}
-        </div>
-        <p class="font-[300] text-[#ff6e00] text-[13px] py-[20px]">
-          Only {{ product.variants.first.inventory_quantity }} left in stock!
-        </p>
+            {%- when 'description' -%}
+              <div class="text-[13px] font-[300] leading-[1.25] mb-[10px] lg:text-[14px]">
+                {{ product.description }}
+              </div>
 
-        <div class="lg:border lg:border-[#ccc] lg:w-full lg:h-[1px] lg:mb-[20px]"></div>
+            {%- when 'price' -%}
+              <div class="product-price" data-section-id="{{ block.id }}">
+                {%- if settings.currency_code_enable -%}
+                  <p class="text-[30px] font-[500] leading-[1.2] text-[#000]">
+                    {{ product.price | money_with_currency }}
+                  </p>
+                {%- else -%}
+                  <p class="text-[30px] font-[500] leading-[1.2] text-[#000]">
+                    {{ product.price | money }}
+                  </p>
+                {%- endif -%}
+              </div>
 
-        {% comment %} component price {% endcomment %}
-        <div>
-          {%- if settings.currency_code_enable -%}
-            <p class="text-[30px] font-[500] leading-[1.2] text-[#000]">
-              {{ product.price | money_with_currency }}
-            </p>
-          {%- else -%}
-            <p class="text-[30px] font-[500] leading-[1.2] text-[#000]">
-              {{ product.price | money }}
-            </p>
-          {%- endif -%}
-        </div>
+            {%- when 'collection' -%}
+              <div class="product-collection">
+                <a href="#" class="text-[13px] font-[300] text-[#808080]">
+                  {{ product.collections.first.title }}
+                </a>
+              </div>
+
+            {%- when 'inventory' -%}
+              <div class="product-inventory" data-section-id="{{ section.id }}">
+                {%- if product.selected_or_first_available_variant.inventory_quantity > 0 -%}
+                  <p class="font-[300] text-[#ff6e00] text-[13px] py-[20px] lg:text-[14px]">
+                    Only {{ product.selected_or_first_available_variant.inventory_quantity }} left in stock!
+                  </p>
+                {%- else -%}
+                  <p class="font-[300] text-[#ff6e00] text-[13px] py-[20px] lg:text-[14px]">
+                    Out of stock
+                  </p>
+                {%- endif -%}
+              </div>
+            {%- when 'divider' -%}
+              <div class="lg:border lg:border-[#ccc] lg:w-full lg:h-[1px] lg:mb-[20px]"></div>
+
+          {%- endcase -%}
+        {%- endfor -%}
       </div>
 
       {% comment %} PRODUCT VARIANTS {% endcomment %}
-      <div class="product-options my-[20px] mx-[20px] text-[13px]">
-        {%- if product.selected_or_first_available_variant -%}
+      <product-options>
+        <div class="product-options my-[20px] mx-[20px] text-[13px]">
           {%- for option in product.options_with_values -%}
             <div class="mt-4">
               <p class="mb-2">
                 Select {{ option.name }}:
-                <strong>
+                <strong
+                  class="variant-name font-semibold"
+                  data-option=" option-{{ option.name | downcase }}"
+                  data-value="{{ product.variants.first.options[forloop.index0] }}">
                   {{- product.variants.first.options[forloop.index0] -}}
                 </strong>
               </p>
-
               <div class="product-options-list">
-                <div class="grid grid-cols-4 gap-[5px]">
+                <div class="grid grid-cols-4 product-option-wrapper gap-[5px]" data-option-position="{{ option.position }}">
                   {%- for value in option.values -%}
-                    {%- for variant in product.variants -%}
-                      {%- if variant.options contains value and variant.featured_image
-                      -%}
-                        <div class="product-option-item">
-                          <div class="relative flex-[0_0_25%]">
-                            <input
-                              type="radio"
-                              id="option-{{ option.name | handleize }}-{{ forloop.index0 }}"
-                              name="option-{{ option.name | handleize }}"
-                              class="hidden peer"
-                              value="{{ value }}"
-                              data-title="{{ product.variants.first.title }}"
-                              data-variant-id="{{ product.variants.first.id }}"
-                              {%- if product.selected_or_first_available_variant.options contains value %}
-                              checked
-                              {%- endif %}>
-                            {% comment %} chatgpt phân biệt giữa peer và group, 1 thằng tương tác parent child 1 thằng tương tác theo dạng sibling... {% endcomment %}
-                            <label
-                              for="option-{{ option.name | handleize }}-{{ forloop.index0 }}"
-                              style="background-image: url('{{ variant.featured_image | image_url }}');"
-                              class="product-option-label bg-center bg-cover block cursor-pointer border border-gray-300 rounded-md 
-                            peer-checked:border-black peer-checked:ring-1 peer-checked:ring-black">
+                    {%- assign variant = product.variants | where: option_name, value | first -%}
+                    <div class="product-option-item">
+                      <div class="relative flex-[0_0_25%]">
+                        <input
+                          type="radio"
+                          id="option-{{ option.name | handleize }}-{{ forloop.index0 }}"
+                          name="{{ option.name }}"
+                          class="hidden peer"
+                          value="{{ value | escape }}"
+                          {%- if value.selected -%}
+                          checked
+                          {%- endif -%}>
 
-                              <span class="block h-[87px]"></span>
-                            </label>
-
-                            {% comment %} icon checked {% endcomment %}
-                            <span class="icon-checkbox hidden peer-checked:block z-10">
-                              {% render "icon-checkbox" %}
-                            </span>
-                          </div>
-                        </div>
-                        {%- break -%}
-                      {%- endif -%}
-                    {%- endfor -%}
+                        {% if variant != nil %}
+                          <label
+                            for="option-{{ option.name | handleize }}-{{ forloop.index0 }}"
+                            style="background-image: url('{{ variant.featured_image | image_url }}');"
+                            class="bg-center bg-cover block cursor-pointer border border-gray-300 rounded-md 
+                                peer-checked:border-black peer-checked:ring-1 peer-checked:ring-black">
+                            <span class="block h-[87px]"></span>
+                          </label>
+                        {% else %}
+                          <label for="option-{{ option.name | handleize }}-{{ forloop.index0 }}" class="flex items-center justify-center rounded-md min-h-[30px] min-w-[58px] p-1.5 border border-[#eee] leading-[1.2] cursor-pointer peer-checked:border-black peer-checked:ring-1 peer-checked:ring-black">
+                            {{ value | escape -}}
+                          </label>
+                        {% endif %}
+                        {% comment %} icon checked {% endcomment %}
+                        <span class="icon-checkbox hidden peer-checked:block z-10">
+                          {%- render "icon-checkbox" -%}
+                        </span>
+                      </div>
+                    </div>
                   {%- endfor -%}
                 </div>
               </div>
             </div>
           {%- endfor -%}
-        {%- endif -%}
+
+          <select name="id" class="hidden">
+            {%- for variant in product.variants -%}
+              <option
+                value="{{ variant.id }}"
+                data-price="{{ variant }}"
+                data-quantity="{{ variant.inventory_quantity }}">{{ variant.title }}</option>
+            {%- endfor -%}
+          </select>
+        </div>
+      </product-options>
+
+      {% comment %} buttons {% endcomment %}
+      <div class="add-to-cart my-[20px] mx-[20px] text-[13px]">
+        {%- form 'product'
+          , product -%}
+          <input
+            type="hidden"
+            name="id"
+            value="{{ product.selected_or_first_available_variant.id }}">
+          {% comment %} {{ form | payment_button }} {% endcomment %}
+
+          <button class="btn-add-cart w-full h-[50px] font-[500] flex justify-center items-center px-[25px] gap-[13px] border border-[#000] text-black text-[15px] mb-[20px] hover:bg-[#1e2338] hover:text-[#fff] transition-all group">
+            {%- render 'icon-cart'
+              , class: "text-black group-hover:text-white" -%}
+            Add to cart</button>
+        {%- endform -%}
+
+        <div class="flex gap-[15px] items-center justify-center mt-[20px] text-[12px]">
+          <div>
+            <button>Add to wishlist</button>
+          </div>
+          <div>
+            <button class="flex items-center justify-center gap-[10px]">
+              {%- render 'icon-mail' -%}
+              Ask about products</button>
+          </div>
+        </div>
+      </div>
+
+      {% comment %} accordion {% endcomment %}
+      <div class="my-[20px] mx-[20px]">
+        <details>
+          <summary>Description</summary>
+          <p>{{ product.description }}</p>
+        </details>
       </div>
     </div>
   </div>
 </div>
-
 <script>
   window.productData = {
     variants: {{ product.variants | json }},
@@ -169,33 +236,137 @@
 <script src="{{ 'tiny-slider.js' |  asset_url }}" defer></script>
 <script src="{{ 'slider.js' |  asset_url }}" defer></script>
 <script src="{{ 'handle-slider.js' | asset_url }}" defer></script>
-<script src="{{ 'handle-variants.js' | asset_url }}" defer></script>
+<script src="{{ 'handle-product-option.js' | asset_url }}" defer></script>
+<script>
+  window.productTest = JSON.parse(JSON.stringify({{ productTest | json }}))
+</script>
 
 {% schema %}
   {
-    "name": "main-page",
+    "name": "Main product page",
     "settings": [
       {
+        "type": "product",
+        "id": "product",
+        "label": "Product",
+        "default": ""
+      },
+      {
         "type": "select",
-        "id": "change_item",
-        "label": "Change Item Slider",
+        "id": "change_image_variant_option",
+        "label": "Show image variant option",
         "options": [
           {
-            "label": "1 item",
-            "value": "1"
+            "label": "Option 1",
+            "value": "option1"
           },
           {
-            "label": "2 item",
-            "value": "2"
+            "label": "Option 2",
+            "value": "option2"
+          },
+          {
+            "label": "Option 3",
+            "value": "option3"
           }
         ],
-        "default": "1"
+        "default": "option2"
+      },
+      {
+        "type": "select",
+        "id": "item_showing_on_slice",
+        "label": "Item showing on slide",
+        "options": [
+          {
+            "value": "4",
+            "label": "4 items"
+          },
+          {
+            "value": "5",
+            "label": "5 items"
+          },
+          {
+            "value": "6",
+            "label": "6 items"
+          }
+        ],
+        "default": "4"
       }
     ],
-    "blocks": [],
+    "blocks": [
+      {
+        "type": "title",
+        "name": "t:sections.main-product.blocks.title.name",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "select",
+            "id": "title_select_change_heading_style",
+            "label": "Heading size",
+            "options": [
+              {
+                "value": "14px",
+                "label": "Small"
+              },
+              {
+                "value": "16px",
+                "label": "Medium"
+              },
+              {
+                "value": "18px",
+                "label": "Large"
+              },
+              {
+                "value": "20px",
+                "label": "Extra large"
+              },
+              {
+                "value": "24px",
+                "label": "Extra extra large"
+              }
+            ],
+            "default": "14px"
+          }
+        ]
+      },
+      {
+        "type": "description",
+        "name": "Description",
+        "limit": 1
+      },
+      {
+        "type": "collection",
+        "name": "Collection",
+        "limit": 1
+      },
+      {
+        "type": "price",
+        "name": "Price",
+        "limit": 1
+      },
+      {
+        "type": "inventory",
+        "name": "Inventory",
+        "limit": 1
+      },
+      {
+        "type": "divider",
+        "name": "Divider",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "text",
+            "id": "divider_padding",
+            "label": "Padding"
+          }
+        ]
+      }
+    ],
     "presets": [
       {
-        "name": "My main product page"
+        "name": "My main product page",
+        "settings": {
+          "product": "12321"
+        }
       }
     ]
   }
