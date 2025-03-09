@@ -4,49 +4,23 @@
 
 {%- assign productTest = product -%}
 
-<div class="main-page max-w-full mx-auto w-[1440px] lg:mt-[30px]" data-section-id="{{ section.id }}">
+
+  <div
+  class="main-page max-w-full mx-auto w-[1440px] lg:mt-[30px]"
+  data-section-id="{{ section.id }}"
+  data-item-showing="{{ section.settings.item_showing_on_slice }}">
   <div class="grid grid-cols-1 md:grid-cols-2 lg:flex">
-    <div class="product-carousel max-w-full max-h-full mb-[24px]" data-item-showing="{{ section.settings.item_showing_on_slice }}">
-      <div class="lg:flex ">
-        {% comment %} PRODUCT SLIDE CONTAINER {% endcomment %}
-        <div class="lg:order-1">
-          <div class="product-slider">
-            {%- if product.images.size > 0 -%}
-              {%- for image in product.images -%}
-                <div class="aspect-square w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
-                  <img
-                    srcset="
-                      {% if image.width >= 180 %}{{ image | image_url: width: 180 }} 180w,{% endif %}
-                      {% if image.width >= 375 %}{{ image | image_url: width: 375 }} 375w,{% endif %}
-                      {% if image.width >= 1100 %}{{ image | image_url: width: 1100 }} 1100w,{% endif %}
-                      {% if image.width >= 1600 %}{{ image | image_url: width: 1600 }} 1600w,{% endif %}
-                      {% if image.width >= 1900 %}{{ image | image_url: width: 1900 }} 1900w,{% endif %}
-                      {{ image | image_url }} {{ image.width }}w
-                    "
-                    src="{{ image | image_url: width: 375 }}"
-                    sizes="(min-width: 1200px) 25vw, (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
-                    loading="lazy"
-                    width="576"
-                    height="{{ 576 | divided_by: image.aspect_ratio }}"
-                    class="w-full h-full object-cover"
-                    alt="{{ image.alt | default: product.title | escape }}"
-                    data-image-id="{{ image.id }}">
-                </div>
-              {%- endfor -%}
-            {%- endif -%}
-          </div>
-        </div>
-        {% comment %} PRODUCT SLIDE NAV {% endcomment %}
-        <div class="product-slider-nav mt-[2px] lg:mr-[20px]">
-          {%- if product.images.size > 0 -%}
-            {%- for image in product.images -%}
-              {{ image.id | json }}
-              <div
-                class="product-nav-item h-[70px] lg:h-[120px] lg:w-[120px] "
-                data-image-id="{{ image.id }}"
-                data-media-index="{{ forloop.index }}">
-                <img
-                  srcset="
+    <div class="product-carousel max-w-full max-h-full mb-[24px]">
+      <product-slider>
+        <div class="lg:flex ">
+          {% comment %} PRODUCT SLIDE CONTAINER {% endcomment %}
+          <div class="lg:order-1">
+            <div class="product-slider">
+              {%- if product.images.size > 0 -%}
+                {%- for image in product.images -%}
+                  <div class="aspect-square w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
+                    <img
+                      srcset="
                     {% if image.width >= 180 %}{{ image | image_url: width: 180 }} 180w,{% endif %}
                     {% if image.width >= 375 %}{{ image | image_url: width: 375 }} 375w,{% endif %}
                     {% if image.width >= 1100 %}{{ image | image_url: width: 1100 }} 1100w,{% endif %}
@@ -54,19 +28,50 @@
                     {% if image.width >= 1900 %}{{ image | image_url: width: 1900 }} 1900w,{% endif %}
                     {{ image | image_url }} {{ image.width }}w
                   "
-                  src="{{ image | image_url: width: 375 }}"
-                  sizes="(min-width: 1200px) 25vw, (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
-                  loading="lazy"
-                  width="576"
-                  height="{{ 576 | divided_by: image.aspect_ratio }}"
-                  class="w-full h-full object-cover lg:min-w-[70px]"
-                  alt="{{ image.alt | default: product.title | escape }}"
-                  data-image-id="{{ image.id }}">
-              </div>
-            {%- endfor -%}
-          {%- endif -%}
+                      src="{{ image | image_url: width: 375 }}"
+                      sizes="(min-width: 1200px) 25vw, (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
+                      loading="lazy"
+                      width="576"
+                      height="{{ 576 | divided_by: image.aspect_ratio }}"
+                      class="w-full h-full object-cover"
+                      alt="{{ image.alt | default: product.title | escape }}"
+                      data-image-id="{{ image.id }}">
+                  </div>
+                {%- endfor -%}
+              {%- endif -%}
+            </div>
+          </div>
+          {% comment %} PRODUCT SLIDE NAV {% endcomment %}
+          <div class="product-slider-nav mt-[2px] lg:mr-[20px]">
+            {%- if product.images.size > 0 -%}
+              {%- for image in product.images -%}
+                <div
+                  class="product-nav-item h-[70px] lg:h-[120px] lg:w-[120px] "
+                  data-image-id="{{ image.id }}"
+                  data-media-index="{{ forloop.index }}">
+                  <img
+                    srcset="
+                  {% if image.width >= 180 %}{{ image | image_url: width: 180 }} 180w,{% endif %}
+                  {% if image.width >= 375 %}{{ image | image_url: width: 375 }} 375w,{% endif %}
+                  {% if image.width >= 1100 %}{{ image | image_url: width: 1100 }} 1100w,{% endif %}
+                  {% if image.width >= 1600 %}{{ image | image_url: width: 1600 }} 1600w,{% endif %}
+                  {% if image.width >= 1900 %}{{ image | image_url: width: 1900 }} 1900w,{% endif %}
+                  {{ image | image_url }} {{ image.width }}w
+                "
+                    src="{{ image | image_url: width: 375 }}"
+                    sizes="(min-width: 1200px) 25vw, (min-width: 750px) calc((100vw - 11.5rem) / 2), calc(100vw - 4rem)"
+                    loading="lazy"
+                    width="576"
+                    height="{{ 576 | divided_by: image.aspect_ratio }}"
+                    class="w-full h-full object-cover lg:min-w-[70px]"
+                    alt="{{ image.alt | default: product.title | escape }}"
+                    data-image-id="{{ image.id }}">
+                </div>
+              {%- endfor -%}
+            {%- endif -%}
+          </div>
         </div>
-      </div>
+      </product-slider>
     </div>
 
     {% comment %} PRODUCT DETAIL {% endcomment %}
@@ -216,17 +221,17 @@
           </div>
         </div>
       </div>
-
-      {% comment %} accordion {% endcomment %}
-      <div class="my-[20px] mx-[20px]">
-        <details>
-          <summary>Description</summary>
-          <p>{{ product.description }}</p>
-        </details>
-      </div>
     </div>
   </div>
+
+  {% comment %} PRODUCT RELATED {% endcomment %}
+  <div>
+    <h2 class="text-[24px] text-center text-black">Trendsetters'
+      <span class="font-bold">Recommendations</span>
+    </h2>
+  </div>
 </div>
+
 <script>
   window.productData = {
     variants: {{ product.variants | json }},
@@ -248,8 +253,7 @@
       {
         "type": "product",
         "id": "product",
-        "label": "Product",
-        "default": ""
+        "label": "Product"
       },
       {
         "type": "select",

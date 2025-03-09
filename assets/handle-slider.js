@@ -1,204 +1,201 @@
-// document.addEventListener("DOMContentLoaded", function () {
-//   var mainSlider;
-//   var thumbnailSlider;
-//   const isDesktop = window.innerWidth >= 768;
-//   const breakPoint = 768;
+const SCREEN = 1024;
 
-//   const productImageNavItems = document.querySelectorAll(
-//     ".product-nav-item img",
-//   );
+class ProductSlider extends HTMLElement {
+  constructor() {
+    super();
 
-//   function handleSliderChange(info) {
-//     let currentSlide = info.index;
+    this.getSelectors();
+    this.isDesktop = window.innerWidth >= SCREEN;
 
-//     productImageNavItems.forEach((item, idx) => {
-//       item.classList.toggle("active-thumb", idx === currentSlide);
-//     });
+    this.mainSlider = null;
+    this.thumbnailSlider = null;
 
-//     thumbnailSlider.getInstance().goTo(currentSlide);
-//   }
+    this.currentTimoutRef = null;
+  }
 
-//   function initThumbnailSlider() {
-//     thumbnailSlider = new Slider({
-//       displayItemOnScreen: 4,
-//       sliderContainerSelector: ".product-slider-nav",
-//       globalConfig: {
-//         axis: isDesktop ? "vertical" : "horizontal",
-//         rewind: isDesktop ? true : false,
-//       },
-//     });
-//   }
+  getSelectors() {
+    this.productNavElement = this.querySelector(".product-slider-nav");
+    this.productMainElement = this.querySelector(".product-slider-main");
+    this.productImageNavItems = this.querySelectorAll(".product-nav-item img");
+  }
 
-//   function initMainSlider() {
-//     mainSlider = new Slider();
-//   }
+  connectedCallback() {
+    console.log("connectedCallback ProductSlider running................");
+    this.init();
 
-//   function init() {
-//     initMainSlider();
-//     initThumbnailSlider();
-
-//     setTimeout(() => {
-//       let currentSlide = mainSlider.getInstance().getInfo().index;
-
-//       productImageNavItems.forEach((item, idx) => {
-//         item.classList.toggle("active-thumb", idx === currentSlide);
-//       });
-
-//       thumbnailSlider.getInstance().goTo(currentSlide);
-//     }, 100);
-
-//     // handle slider change
-//     mainSlider.getInstance().events.on("indexChanged", handleSliderChange);
-
-//     // handle thumbnail slider click
-//     productImageNavItems.forEach((thumb, index) => {
-//       thumb.addEventListener("click", function () {
-//         mainSlider.getInstance().goTo(index);
-
-//         productImageNavItems.forEach((item) =>
-//           item.classList.remove("active-thumb"),
-//         );
-//         thumb.classList.add("active-thumb");
-//       });
-//     });
-//   }
-
-//   init();
-// });
-
-document.addEventListener("DOMContentLoaded", function () {
-  let currentTimeoutRef;
-
-  function initSliders(sectionId, isDesktop = window.innerWidth >= 768) {
-    let mainSlider, thumbnailSlider;
-
-    const section = document.querySelector(`[data-section-id="${sectionId}"]`);
-    if (!section) return;
-
-    const productImageNavItems = section.querySelectorAll(
-      ".product-nav-item img",
+    // event shopify
+    document.addEventListener(
+      "shopify:section:load",
+      this.handleSectionLoad.bind(this),
     );
 
-    const sliderSize = section.dataset.itemShowing
+    window.addEventListener("resize", () => {
+      if (this.currentTimoutRef) {
+        clearTimeout(this.currentTimoutRef);
+      }
+
+      this.currentTimoutRef = setTimeout(() => {
+        this.updateConfigThumbSlider.call(this);
+      }, 200);
+    });
+  }
+
+  disconnectedCallback() {
+    console.log("disconnectedCallback ProductSlider running................");
+  }
+
+  init() {
+    const section = this.closest(`[data-section-id]`);
+
+    if (!section) return;
+
+    this.sliderSize = section.dataset.itemShowing
       ? parseInt(section.dataset.itemShowing, 10)
       : 4;
 
-    function handleSliderChange(info) {
-      let currentSlide = info.index;
+    this.initMainSlider();
+    this.initThumbnailSlider();
 
-      productImageNavItems.forEach((item, idx) => {
-        item.classList.toggle("active-thumb", idx === currentSlide);
-      });
+    if (this.mainSlider) {
+      const mainInstance = this.mainSlider.getInstance();
+      if (mainInstance) {
+        let currentSlide = mainInstance.getInfo().index;
 
-      if (thumbnailSlider) {
-        const thumbInstance = thumbnailSlider.getInstance();
-        if (thumbInstance) thumbInstance.goTo(currentSlide);
+        this.productImageNavItems.forEach((item, idx) => {
+          item.classList.toggle("active-thumb", idx === currentSlide);
+        });
+
+        if (this.thumbnailSlider) {
+          const thumbInstance = this.thumbnailSlider.getInstance();
+          if (thumbInstance) thumbInstance.goTo(currentSlide);
+        }
       }
     }
 
-    function initThumbnailSlider() {
-      thumbnailSlider = new Slider({
-        displayItemOnScreen: sliderSize,
-        sliderContainerSelector: ".product-slider-nav",
-        globalConfig: {
-          axis: isDesktop ? "vertical" : "horizontal",
-          rewind: isDesktop ? true : false,
-        },
-      });
-
-      subscribe(PUB_SUB_EVENTS.imageSliderUpdated, (data) => {
-        const { imageId } = data;
-
-        const slideIndex = Array.from(
-          document.querySelectorAll(".product-nav-item"),
-        ).findIndex((item) => {
-          return item.dataset.imageId === String(imageId);
-        });
-
-        if (slideIndex !== -1) {
-          handleSliderChange({ index: slideIndex });
-
-          // handle main slider change
-          if (mainSlider) {
-            const mainInstance = mainSlider.getInstance();
-            if (mainInstance) mainInstance.goTo(slideIndex);
-          }
-        }
-      });
-    }
-
-    function initMainSlider() {
-      mainSlider = new Slider();
-    }
-
-    function setupEventListeners() {
-      setTimeout(() => {
-        if (mainSlider) {
-          const mainInstance = mainSlider.getInstance();
-          if (mainInstance) {
-            let currentSlide = mainInstance.getInfo().index;
-
-            productImageNavItems.forEach((item, idx) => {
-              item.classList.toggle("active-thumb", idx === currentSlide);
-            });
-
-            if (thumbnailSlider) {
-              const thumbInstance = thumbnailSlider.getInstance();
-              if (thumbInstance) thumbInstance.goTo(currentSlide);
-            }
-          }
-        }
-      }, 100);
-
-      if (mainSlider) {
-        const mainInstance = mainSlider.getInstance();
-        if (mainInstance) {
-          mainInstance.events.on("indexChanged", handleSliderChange);
-        }
+    if (this.mainSlider) {
+      const mainInstance = this.mainSlider.getInstance();
+      if (mainInstance) {
+        mainInstance.events.on(
+          "indexChanged",
+          this.handleSliderChange.bind(this),
+        );
       }
-
-      productImageNavItems.forEach((thumb, index) => {
-        thumb.addEventListener("click", function () {
-          if (mainSlider) {
-            const mainInstance = mainSlider.getInstance();
-            if (mainInstance) mainInstance.goTo(index);
-          }
-
-          productImageNavItems.forEach((item) =>
-            item.classList.remove("active-thumb"),
-          );
-          thumb.classList.add("active-thumb");
-        });
-      });
     }
 
-    initMainSlider();
-    initThumbnailSlider();
-    setupEventListeners();
+    this.productImageNavItems.forEach((thumb, index) => {
+      thumb.addEventListener("click", () => {
+        if (this.mainSlider) {
+          const mainInstance = this.mainSlider.getInstance();
+          if (mainInstance) mainInstance.goTo(index);
+        }
+
+        this.productImageNavItems.forEach((item) =>
+          item.classList.remove("active-thumb"),
+        );
+        thumb.classList.add("active-thumb");
+      });
+    });
   }
 
-  // Khởi tạo slider cho tất cả section khi trang load
-  document.querySelectorAll("[data-section-id]").forEach((section) => {
-    initSliders(section.dataset.sectionId);
-  });
+  initMainSlider() {
+    if (typeof Slider !== "undefined") {
+      this.mainSlider = new Slider();
+    } else {
+      console.error("Slider is not defined");
+    }
+  }
 
-  window.addEventListener("resize", () => {
-    if (currentTimeoutRef) {
-      clearTimeout(currentTimeoutRef);
+  initThumbnailSlider() {
+    this.thumbnailSlider = new Slider({
+      displayItemOnScreen: this.sliderSize,
+      sliderContainerSelector: this.productNavElement,
+      globalConfig: {
+        axis: this.isDesktop ? "vertical" : "horizontal",
+        rewind: this.isDesktop ? true : false,
+      },
+    });
+
+    subscribe(PUB_SUB_EVENTS.imageSliderUpdated, (data) => {
+      const { imageId } = data;
+
+      const slideIndex = Array.from(
+        document.querySelectorAll(".product-nav-item"),
+      ).findIndex((item) => {
+        return item.dataset.imageId === String(imageId);
+      });
+
+      if (slideIndex !== -1) {
+        this.handleSliderChange.bind(this, { index: slideIndex });
+
+        // handle main slider change
+        if (this.mainSlider) {
+          const mainInstance = this.mainSlider.getInstance();
+          if (mainInstance) mainInstance.goTo(slideIndex);
+        }
+      }
+    });
+  }
+
+  handleSliderChange(info) {
+    let currentSlide = info.index;
+
+    if (this.productImageNavItems) {
+      this.productImageNavItems.forEach((item, idx) => {
+        item.classList.toggle("active-thumb", idx === currentSlide);
+      });
     }
 
-    currentTimeoutRef = setTimeout(() => {
-      document.querySelectorAll("[data-section-id]").forEach((section) => {
-        const newIsDesktop = window.innerWidth >= 768;
-        const sectionId = section.dataset.sectionId;
-        initSliders(sectionId, newIsDesktop);
-      });
-    }, 200);
-  });
+    this.thumbnailSlider.getInstance().goTo(currentSlide);
+  }
 
-  document.addEventListener("shopify:section:load", function (event) {
-    console.log("Section reloaded:", event.detail.sectionId);
+  handleSectionLoad(event) {
     const sectionId = event.detail.sectionId;
-    initSliders(sectionId);
-  });
-});
+
+    if (this.closest("[data-section-id = '" + sectionId + "']")) {
+      this.init();
+    }
+  }
+
+  updateConfigThumbSlider() {
+    if (this.isDesktop !== window.innerWidth >= SCREEN) {
+      this.isDesktop = window.innerWidth >= SCREEN;
+    }
+
+    if (!this.productNavElement) {
+      console.error("Thumbnail slider container not found!");
+      return;
+    }
+
+    if (!this.thumbnailSlider || !this.mainSlider) return;
+
+    const mainInstance = this.mainSlider.getInstance();
+    const currentSlide = mainInstance ? mainInstance.getInfo().index : 0;
+
+    this.mainSlider.destroy();
+    this.thumbnailSlider.destroy();
+
+    this.getSelectors();
+
+    this.mainSlider = new Slider();
+
+    this.thumbnailSlider = new Slider({
+      displayItemOnScreen: this.sliderSize,
+      sliderContainerSelector: this.productNavElement,
+      globalConfig: {
+        axis: this.isDesktop ? "vertical" : "horizontal",
+        rewind: this.isDesktop,
+      },
+    });
+
+    const thumbInstance = this.thumbnailSlider.getInstance();
+    if (thumbInstance) {
+      thumbInstance.goTo(currentSlide);
+    }
+
+    this.productImageNavItems.forEach((item, idx) => {
+      item.classList.toggle("active-thumb", idx === currentSlide);
+    });
+  }
+}
+
+customElements.define("product-slider", ProductSlider);
